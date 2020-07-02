@@ -23,7 +23,8 @@ arquivo.write("\n")
 arquivo.write("####################")
 arquivo.write("\n")
 arquivo.close()
-
+os.system("cls")
+os.system("exit")
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
