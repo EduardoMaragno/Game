@@ -510,4 +510,3 @@ while True:
             screen.blit(pygame.transform.scale(end_surf,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
             pygame.display.update()
             mainClock.tick(60)
-
