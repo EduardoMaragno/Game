@@ -5,6 +5,11 @@ from data.clip import clip
 mainClock = pygame.time.Clock()
 from pygame.locals import *
 
+#Este jogo foi baseado no game Bauncy Shot Ball, utilizei algumas partes do código e o adaptei, também adicionei novas engines e o placar
+
+
+
+
 arquivo = open("log.txt", "a")
 print("Identifique-se.... ")
 email = input("e-mail: ")

@@ -2,7 +2,7 @@ import pygame, math, os
 from pygame.locals import *
 
 
-# 2d collisions test
+
 def collision_test(object1,object_list):
     collision_list = []
     for obj in object_list:
@@ -10,7 +10,7 @@ def collision_test(object1,object_list):
             collision_list.append(obj)
     return collision_list
 
-# 2d physics object
+
 class physics_obj(object):
    
     def __init__(self,x,y,x_size,y_size):
@@ -46,8 +46,6 @@ class physics_obj(object):
             self.change_y = 0
             self.y = self.rect.y
 
-# 3d collision detection
-# todo: add 3d physics-based movement
 
 class cuboid(object):
     
@@ -90,7 +88,7 @@ def blit_center(surf,surf2,pos):
 class entity(object):
     global animation_database, animation_higher_database
    
-    def __init__(self,x,y,size_x,size_y,e_type): # x, y, size_x, size_y, type
+    def __init__(self,x,y,size_x,size_y,e_type):
         self.x = x
         self.y = y
         self.size_x = size_x
@@ -103,10 +101,10 @@ class entity(object):
         self.flip = False
         self.offset = [0,0]
         self.rotation = 0
-        self.type = e_type # used to determine animation set among other things
+        self.type = e_type
         self.action_timer = 0
         self.action = ''
-        self.set_action('idle') # overall action for the entity
+        self.set_action('idle')
         self.entity_data = {}
         self.alpha = None
  
@@ -211,7 +209,7 @@ class entity(object):
                 image_to_render.set_alpha(self.alpha)
             blit_center(surface,image_to_render,(int(self.x)-scroll[0]+self.offset[0]+center_x,int(self.y)-scroll[1]+self.offset[1]+center_y))
  
-# animation stuff
+
 
 global animation_database
 animation_database = {}
@@ -219,8 +217,7 @@ animation_database = {}
 global animation_higher_database
 animation_higher_database = {}
  
-# a sequence looks like [[0,1],[1,1],[2,1],[3,1],[4,2]]
-# the first numbers are the image name(as integer), while the second number shows the duration of it in the sequence
+
 def animation_sequence(sequence,base_path,colorkey=(255,255,255),transparency=255):
     global animation_database
     result = []
@@ -262,7 +259,7 @@ def load_animations(path):
             animation_higher_database[entity_type] = {}
         animation_higher_database[entity_type][animation_id] = [anim.copy(),tags]
 
-# particles
+# particulas
 
 def particle_file_sort(l):
     l2 = []
@@ -324,7 +321,7 @@ class particle(object):
         return running
         
 
-# other useful functions
+# Outras funções 
 
 def swap_color(img,old_c,new_c):
     img.set_colorkey(old_c)
