@@ -351,5 +351,163 @@ while True:
     remove_list.sort(reverse=True)
     for proj in remove_list:
         projectiles.pop(proj)
+    # Efeitos Circle ----------------------------------------- #
+    remove_list = []
+    n = 0
+    for circle in circle_effects: # center, radius, time_left
+        pygame.draw.circle(display,gray,[int(circle[0][0]),int(circle[0][1])],int(circle[1]),min(int(circle[2]/3)+1,int(circle[1])))
+        circle[2] += (-0.7-circle[2])/8
+        circle[1] += circle[2]**0.7+0.5
+        if circle[2] <= 0:
+            remove_list.append(n)
+        n += 1
+    remove_list.sort(reverse=True)
+    for circle in remove_list:
+        circle_effects.pop(circle)
+    # GUI ---------------------------------------------------- #
+    gui_surf = display.copy()
+    gui_surf.fill((0,0,0))
+    gui_surf.set_colorkey((0,0,0))
+    if failure == -1:
+        draw_number(str(score),3,3,gui_surf)
+    if instructions != 0:
+        if instructions < 40:
+            gui_surf.blit(instructions_img,(72,83))
+        else:
+            gui_surf.blit(instructions_img,(72,80))
+        if instructions > 55:
+            instructions = 1
+        instructions += 1
+    # Botões ------------------------------------------------ #
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                pygame.quit()
+                sys.exit()
+            if event.key == K_RIGHT:
+                right = True
+                instructions = 0
+            if event.key == K_LEFT:
+                left = True
+                instructions = 0
+            if event.key == K_UP:
+                if player_cooldown <= 0:
+                    player_cooldown = player_max_cooldown
+                    projectiles.append(['player',center,-(player_rotation+13.5),projectile_data['player'][1]]) # color, position, rotation, size
+                    shoot_s.play()
+                instructions = 0
+        if event.type == KEYUP:
+            if event.key == K_RIGHT:
+                right = False
+            if event.key == K_LEFT:
+                left = False
+    # Update ------------------------------------------------- #
+    display_2 = display.copy()
+    display_2.fill((31,48,56))
+    display_2.blit(display,(0,0))
+    surf = display_2.copy()
+    surf.fill((100,100,100))
+    display_2.blit(surf,(0,0),special_flags=BLEND_MULT)
+    screen.blit(pygame.transform.scale(display_2,(WINDOWWIDTH-50,WINDOWHEIGHT-50)),(24,24))
+    screen.blit(pygame.transform.scale(bg_img,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
+    display.set_colorkey((0,0,0))
+    screen.blit(pygame.transform.scale(display,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
+    screen.blit(pygame.transform.scale(gui_surf,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
+    if (warping != -1) and (failure == -1):
+        if warping > 20:
+            warping = -2
+            if scored:
+                scored = False
+                particles = []
+                projectiles = []
+                balls = [[125,175,0,0]]
+                time_since_last_score = 1
+                for i in range(20):
+                    particles.append(e.particle(balls[-1][0]+random.randint(0,ball_radius*2)-ball_radius,balls[-1][1]+random.randint(0,ball_radius*2)-ball_radius,'p',[random.randint(0,60)/10-3,random.randint(0,60)/10-3],0.2,random.randint(0,20)/10,gray))
+                circle_effects.append([[125,175],10,20])
+        if scored == False:
+            if warping > 10:
+                warping = -2
+        screen.blit(pygame.transform.scale(screen,(WINDOWWIDTH+warping*2,int(WINDOWHEIGHT+warping*2*(7/5)))),(-warping+random.randint(0,12)-6,-warping*(7/5)))
+        for i in range(random.randint(6,24)):
+            size_x = random.randint(30,200)
+            size_y = random.randint(4,24)
+            pos_x = random.randint(0,WINDOWWIDTH)
+            pos_y = random.randint(0,WINDOWHEIGHT)
+            img = clip(screen.copy(),pos_x-int(size_x/2),pos_y-int(size_y/2),size_x,size_y)
+            screen.blit(img,(pos_x+random.randint(0,80)-40+int(size_x/2),pos_y+int(size_y/2)))
+        warping += 1
+    pygame.display.update()
+    mainClock.tick(60)
+    if failure != -1:
+        screen_copy = screen.copy()
+        while failure != -1:
+            failure += 1
+            temp_surf = gui_surf.copy()
+            temp_surf.fill((31,48,56))
+            temp_surf.set_alpha(min(failure*10,100))
+            screen.blit(screen_copy,(0,0))
+            screen.blit(pygame.transform.scale(temp_surf,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
+            end_surf = gui_surf.copy()
+            end_surf.fill((0,0,0))
+            end_surf.set_colorkey((0,0,0))
+            if failure > 10:
+                if failure-11 < score:
+                    score_tick_s.play()
+                if failure-11 == score:
+                    score_final_s.play()
+                num = min(failure-11,score)
+                draw_number(str(num),125-(len(str(num))*23/2),160,end_surf)
+            if failure-30 > score:
+                if failure % 55 < 40:
+                    end_surf.blit(instructions_img,(72,223))
+                else:
+                    end_surf.blit(instructions_img,(72,220))
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+                    if event.key in [K_RIGHT,K_LEFT,K_UP]:
+                        if failure-30 > score:
+                            right = False
+                            left = False
+                            player_rotation = 76
+                            player_polygon_rot = 0
+                            player_polygon_spin = 0
+                            player_cooldown = 0
+                            player_max_cooldown = 20
+                            opponent_rotation = 256
+                            opponent_polygon_rot = 0
+                            opponent_polygon_spin = 0
+                            opponent_cooldown = 0
+                            opponent_true_cooldown = 0
+                            opponent_max_cooldown = 20
+                            opponent_accuracy = 50
+                            opponent_speed = 70
+                            opponent_target_offset = random.randint(0,int(opponent_accuracy))-int(opponent_accuracy/2)
+                            projectile_data = {'player':[8,20,1.3],'opponent':[8,20,1.3]}
+                            projectiles = []
+                            slash_particles = []
+                            particles = []
+                            circle_effects = []
+                            balls = [[125,175,0,0]]
+                            for i in range(20):
+                                particles.append(e.particle(balls[-1][0]+random.randint(0,ball_radius*2)-ball_radius,balls[-1][1]+random.randint(0,ball_radius*2)-ball_radius,'p',[random.randint(0,60)/10-3,random.randint(0,60)/10-3],0.2,random.randint(0,20)/10,gray))
+                            circle_effects.append([[125,175],10,20])
+                            opponent_center = [display.get_width()/2,30-polygon_radius]
+                            time_since_last_score = 1
+                            score = 0
+                            warping = -1
+                            scored = False
+                            failure = -1
+            screen.blit(pygame.transform.scale(end_surf,(WINDOWWIDTH,WINDOWHEIGHT)),(0,0))
+            pygame.display.update()
+            mainClock.tick(60)
 
-    
